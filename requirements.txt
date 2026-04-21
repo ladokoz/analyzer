@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+google-genai
+pydantic
+python-multipart
+yt-dlp
+curl-cffi<0.6.0
+python-dotenv

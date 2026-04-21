@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahub Video Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css?v=5">
+</head>
+<body>
+    
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="glass-overlay">
+        <div class="glass-card login-card">
+            <h2>Admin Login</h2>
+            <p class="subtitle">Enter credentials to access the analyzer</p>
+            <input type="text" id="usernameInput" placeholder="Username" />
+            <input type="password" id="passwordInput" placeholder="Password" />
+            <button id="loginBtn" class="btn-primary">Login</button>
+            <p id="loginError" class="error-msg"></p>
+        </div>
+    </div>
+
+    <!-- Layout -->
+    <div class="app-layout" id="mainApp" style="display: none;">
+        <header class="glass-panel" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="margin: 0;">Ahub Video Analyzer</h1>
+            <div>
+                <a href="/api/logs" target="_blank" id="viewLogsBtn" class="btn-secondary" style="text-decoration: none; margin-right: 0.5rem; display: inline-block;">📜 View Logs</a>
+                <button id="clearLogsBtn" class="btn-secondary" style="margin-right: 0.5rem; color: #ff6b6b; border-color: rgba(255,107,107,0.3);">🗑️ Clear Logs</button>
+                <button id="openVideosBtn" class="btn-secondary" style="margin-right: 0.5rem;">🎬 View Videos</button>
+                <button id="openSettingsBtn" class="btn-secondary">⚙️ Settings</button>
+            </div>
+        </header>
+
+        <main class="content-grid">
+            <div class="input-section glass-panel">
+                <h2>Video Queue</h2>
+                <p class="subtitle">Paste YouTube or Vimeo URLs (one per line)</p>
+                <textarea id="urlInput" placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."></textarea>
+                <div class="actions">
+                    <button id="startBtn" class="btn-primary">Start Analysis</button>
+                    <button id="stopBtn" class="btn-secondary" style="color: #ff6b6b; border-color: rgba(255,107,107,0.3);">Stop All</button>
+                    <button id="loadSamplesBtn" class="btn-secondary">Load Samples</button>
+                </div>
+                <div id="queueStatus" class="status-indicator">Idle</div>
+            </div>
+
+            <div class="table-section glass-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;">Analysis Results</h2>
+                    <button id="downloadCsvBtn" class="btn-secondary" style="padding: 0.5rem 1rem; width: auto;">📂 View CSVs</button>
+                </div>
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Internal ID</th>
+                                <th>Date/Time</th>
+                                <th>Video Title</th>
+                                <th>Video URL</th>
+                                <th>Tags</th>
+                                <th>Genres</th>
+                                <th>Animation Techniques</th>
+                                <th>Accessibility</th>
+                                <th>Directors</th>
+                                <th>Producers</th>
+                                <th>Year</th>
+                                <th>Prod Companies</th>
+                                <th>School/Uni</th>
+                                <th>Dist/Sales</th>
+                                <th>Animators</th>
+                                <th>Script Writers</th>
+                                <th>Composers</th>
+                                <th>Sound Designers</th>
+                                <th>Editors</th>
+                                <th>Festivals</th>
+                                <th>Awards</th>
+                                <th>Tokens</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="glass-overlay" style="display: none;">
+        <div class="glass-card settings-card" style="max-height: 90vh; overflow-y: auto;">
+            <h2>Analyzer Settings</h2>
+            
+
+            <label>Model</label>
+            <select id="modelSelect">
+                <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro (≤ 200K context)</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro (> 200K context)</option>
+                <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
+                <option value="gemini-3-pro-preview">Gemini 3 Pro Preview (≤ 200K context)</option>
+                <option value="gemini-3-pro-preview">Gemini 3 Pro Preview (> 200K context)</option>
+                <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite Preview</option>
+                <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview (≤ 200K context)</option>
+                <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview (> 200K context)</option>
+            </select>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.5rem;">
+                <div style="flex:1;">
+                    <label>Input Cost (per 1M)</label>
+                    <input type="number" step="0.001" id="inputCost" placeholder="1.25">
+                </div>
+                <div style="flex:1;">
+                    <label>Output Cost (per 1M)</label>
+                    <input type="number" step="0.001" id="outputCost" placeholder="5.0">
+                </div>
+            </div>
+
+            <br>
+            <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="keepDownloadedVideos" style="width: auto; margin: 0;">
+                <label style="margin: 0; font-weight: normal; font-size: 0.85rem">Keep Downloaded Local Videos (Vimeo)</label>
+            </div>
+
+            <br>
+            <label>Active Custom Prompt</label>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <select id="promptSelect" style="flex: 1; margin: 0;"></select>
+                <button id="addPromptBtn" class="btn-secondary" style="padding: 0.5rem; width: auto;" title="Copy to new prompt">+</button>
+                <button id="delPromptBtn" class="btn-secondary" style="padding: 0.5rem; width: auto;" title="Delete current prompt">-</button>
+            </div>
+            
+            <input type="text" id="promptName" placeholder="Prompt Name (e.g., Short Films)" style="margin-bottom: 0.5rem;">
+            <textarea id="promptInput" rows="4" placeholder="Deep specific instructions for Gemini..."></textarea>
+
+            <div class="modal-actions">
+                <button id="saveSettingsBtn" class="btn-primary">Save Changes</button>
+                <button id="closeSettingsBtn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSVs Modal -->
+    <div id="csvsModal" class="glass-overlay" style="display: none;">
+        <div class="glass-card settings-card" style="max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="margin: 0;">Available CSVs</h2>
+                <div>
+                    <button id="clearCsvsBtn" class="btn-secondary" style="width: auto; padding: 0.25rem 0.75rem; color: #ff6b6b; border-color: rgba(255,107,107,0.3); margin-right: 0.5rem;">Clear All</button>
+                    <button id="closeCsvsBtn" class="btn-secondary" style="width: auto; padding: 0.25rem 0.75rem;">Close</button>
+                </div>
+            </div>
+            <div id="csvListContainer">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Videos Modal -->
+    <div id="videosModal" class="glass-overlay" style="display: none;">
+        <div class="glass-card settings-card" style="max-height: 90vh; overflow-y: auto; width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="margin: 0;">Kept Videos</h2>
+                <div>
+                    <button id="clearVideosBtn" class="btn-secondary" style="width: auto; padding: 0.25rem 0.75rem; color: #ff6b6b; border-color: rgba(255,107,107,0.3); margin-right: 0.5rem;">Clear All</button>
+                    <button id="closeVideosBtn" class="btn-secondary" style="width: auto; padding: 0.25rem 0.75rem;">Close</button>
+                </div>
+            </div>
+            <div id="videosListContainer">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/app.js?v=5"></script>
+</body>
+</html>
