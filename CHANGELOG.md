@@ -1,20 +1,5 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-### Versioning Rules for Future Updates
-- **Major (X.0.0)**: Massive architectural overhauls, rewriting core modules, or completely restructuring the UI.
-- **Minor (1.X.0)**: Adding new features, new endpoints, new visible buttons, or significant enhancements to existing systems (backwards-compatible).
-- **Patch (1.0.X)**: Small bug fixes, caching/performance tweaks, typo corrections, or minor adjustments to CSS styling.
-
----
-
-## [Unreleased]
-*Any work-in-progress features will be tracked here before receiving a version bump.*
-
 ---
 
 ## [1.1.0] - 2026-04-21
