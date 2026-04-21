@@ -41,6 +41,9 @@ const els = {
     delPromptBtn: document.getElementById('delPromptBtn'),
     promptName: document.getElementById('promptName'),
     promptInput: document.getElementById('promptInput'),
+    
+    appVersionDisplay: document.getElementById('appVersionDisplay'),
+    updateAppBtn: document.getElementById('updateAppBtn')
 };
 
 function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }; }
@@ -135,7 +138,61 @@ async function loadSettings() {
         activePrompts = set.prompts && set.prompts.length ? set.prompts : [{id:"default", name:"Default", text:"Analyze"}];
         activePromptId = set.active_prompt_id || activePrompts[0].id;
         renderPromptDropdown();
+        
+        try {
+            const verRes = await fetch('/api/version', { headers: authHeaders() });
+            if (verRes.ok) {
+                const verData = await verRes.json();
+                if (els.appVersionDisplay) els.appVersionDisplay.innerText = verData.version || '?.?.?';
+            }
+        } catch(e) {}
+        
     } catch(err) { console.error(err); }
+}
+
+if (els.updateAppBtn) {
+    els.updateAppBtn.addEventListener('click', async () => {
+        if (els.updateAppBtn.innerText === "Update Now") {
+            els.updateAppBtn.innerText = "Updating...";
+            els.updateAppBtn.disabled = true;
+            try {
+                const res = await fetch('/api/update', { method: 'POST', headers: authHeaders() });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert("Update successful! Please restart your terminal/server to apply backend changes. Frontend changes apply immediately.");
+                    location.reload();
+                } else {
+                    alert("Update failed: " + data.message);
+                }
+            } catch(e) {
+                alert("Update failed: " + e.message);
+            }
+            els.updateAppBtn.innerText = "Check Updates";
+            els.updateAppBtn.disabled = false;
+        } else {
+            els.updateAppBtn.innerText = "Checking...";
+            els.updateAppBtn.disabled = true;
+            try {
+                const res = await fetch('/api/check_update', { method: 'POST', headers: authHeaders() });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.update_available) {
+                        els.updateAppBtn.innerText = "Update Now";
+                        els.updateAppBtn.style.backgroundColor = "var(--danger)";
+                        els.updateAppBtn.style.borderColor = "var(--danger)";
+                    } else {
+                        els.updateAppBtn.innerText = "Up to date!";
+                        setTimeout(() => { els.updateAppBtn.innerText = "Check Updates"; }, 3000);
+                    }
+                } else {
+                    els.updateAppBtn.innerText = "Check Updates";
+                }
+            } catch(e) {
+                els.updateAppBtn.innerText = "Check Updates";
+            }
+            els.updateAppBtn.disabled = false;
+        }
+    });
 }
 
 const MODEL_PRICING = {

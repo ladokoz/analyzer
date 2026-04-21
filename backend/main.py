@@ -7,6 +7,8 @@ import logging
 import urllib.request
 import urllib.parse
 import json
+import re
+import subprocess
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -74,6 +76,44 @@ def update_settings(settings: SettingsModel, authorization: str = Header(None)):
     save_settings(settings)
     logger.info("Application settings updated successfully")
     return {"status": "success"}
+
+@app.get("/api/version")
+def get_version(authorization: str = Header(None)):
+    verify_token(authorization)
+    version = "1.1.0"
+    if os.path.exists("CHANGELOG.md"):
+        with open("CHANGELOG.md", "r", encoding="utf-8") as f:
+            content = f.read()
+            # Look for the first version that starts with a digit inside brackets
+            match = re.search(r"## \[(\d+\.\d+\.\d+)\]", content)
+            if match:
+                version = match.group(1)
+    return {"version": version}
+
+@app.post("/api/check_update")
+def check_update(authorization: str = Header(None)):
+    verify_token(authorization)
+    try:
+        # Fetch latest origin/main
+        subprocess.run(["git", "fetch"], check=True, capture_output=True)
+        # Check if behind origin/main
+        result = subprocess.run(["git", "status", "-uno"], capture_output=True, text=True)
+        is_behind = "Your branch is behind" in result.stdout
+        return {"update_available": is_behind}
+    except Exception as e:
+        logger.error(f"Failed to check for updates: {e}")
+        return {"update_available": False, "error": str(e)}
+
+@app.post("/api/update")
+def perform_update(authorization: str = Header(None)):
+    verify_token(authorization)
+    try:
+        result = subprocess.run(["git", "pull"], capture_output=True, text=True)
+        if result.returncode != 0:
+            return {"status": "error", "message": result.stderr}
+        return {"status": "success", "message": result.stdout}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.get("/api/logs")
 def get_logs(authorization: str = Header(None), token: str = None):

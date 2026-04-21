@@ -10,18 +10,35 @@ Ahub Video Analyzer is an internal, web-based AI tool that leverages the Gemini 
 - **Automated CSV Exports**: Automatically aggregates extracted video data into timestamped CSV batches.
 - **Persistent Queue**: A robust backend queuing system prevents active tasks from halting if the browser is closed.
 - **Robust Environment Security**: Sensitive API keys and credentials are natively managed via a root `.env` system, avoiding exposure through the web UI.
+- **Web-Based Updater**: Push-button updates from the Settings UI to pull the latest version from GitHub.
 
 ---
 
-## Installation & Setup
+## 🚀 Installation & Setup
 
 ### Requirements
 
 - **Python 3.10+**
 - **FFmpeg**: Strongly recommended to be installed locally and injected into your system path for handling complex video downloads via `yt-dlp`. Linux users can run `sudo apt install ffmpeg`.
+- **Git**: Required for the automated update mechanism.
 
-### 1. Repository Access
-Ensure you have the full codebase situated in a dedicated directory on your local Windows machine or Debian server.
+### 1. Repository Access & Git Setup
+For the **Update** button to function, the project directory **must** be a valid Git repository.
+
+**Option A: New Installation (Recommended)**
+```bash
+git clone https://github.com/ladokoz/analyzer.git
+cd analyzer
+```
+
+**Option B: Existing Manual Upload**
+If you uploaded files manually, initialize git and link it to the repository:
+```bash
+git init
+git remote add origin https://github.com/ladokoz/analyzer.git
+git fetch
+git reset --hard origin/main
+```
 
 ### 2. Environment Configuration (.env)
 
@@ -65,10 +82,11 @@ chmod +x run.sh
 
 ---
 
-## Modifying Settings in the Web UI
+## ⚙️ Modifying Settings & Updates
 
-Once logged in, click the **Settings** button near the top right. Here you can configure:
-- **LLM Model Preferences**: Select between different iterations of the Gemini architecture (e.g. Gemini 2.0 Flash or Gemini 3.1 Pro previews).
+Once logged in, click the **⚙️ Settings** button near the top right. Here you can configure:
+- **App Version & Updates**: View the current version (e.g., `v1.2.0`) and click **Check Updates** to pull the latest changes from GitHub automatically.
+- **LLM Model Preferences**: Select between different iterations of the Gemini architecture (e.g., Gemini 2.0 Flash or Gemini 3.1 Pro previews).
 - **Token Price Tracking**: Control your current `Input` and `Output` cost metrics to automatically log analysis costs to the resulting CSV datasets.
 - **Prompt Library**: Create, edit, and toggle between specific instruction prompts designed to extract unique metadata from video visual/audio analysis.
 
@@ -76,7 +94,7 @@ Once logged in, click the **Settings** button near the top right. Here you can c
 
 ---
 
-## File Architecture
+## 🛠 File Architecture
 
 - `backend/main.py`: The core FastAPI routing and server backend logic.
 - `backend/worker.py`: Background threaded queue pipeline to prevent browser disconnects or refreshes from interrupting active API calls.
