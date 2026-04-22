@@ -118,7 +118,7 @@ def process_task(url, internal_id, batch_id):
         csv_path = os.path.join(csv_dir, f"batch_{safe_batch_id}.csv")
         file_exists = os.path.isfile(csv_path)
         
-        with open(csv_path, 'a', newline='', encoding='utf-8') as f:
+        with open(csv_path, 'a', newline='', encoding='utf-8-sig') as f:
             writer = csv.writer(f)
             if not file_exists:
                 writer.writerow(['Internal ID', 'Date/Time', 'Video URL', 'Clean Title', 'Tags', 'Genres', 'Animation Techniques', 'Accessibility Rating', 'Film Directors', 'Film Producers', 'Year', 'Production Companies', 'School or University', 'Dist/Sales Companies', 'Animators', 'Script Writers', 'Music Composers', 'Sound Designers', 'Editors', 'Festival Selection', 'Awards', 'Tokens', 'Cost'])

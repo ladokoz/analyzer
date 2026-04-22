@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2026-04-22
+
+### Fixed
+- **Unicode Encoding**: Enforced UTF-8 encoding across all internal logging, stdout, and stderr streams to prevent crashes when processing films with non-ASCII characters (e.g., full-width quotation marks).
+- **Excel CSV Compatibility**: Migrated CSV exports to `utf-8-sig` encoding, adding a Byte Order Mark (BOM) to ensure special characters (like Polish or accented letters) display correctly when opened in Microsoft Excel.
+- **Settings Persistence**: Fixed potential encoding crashes when saving or loading application prompts containing international characters.
+
+---
+
 ## [1.2.0] - 2026-04-21
 
 ### Added

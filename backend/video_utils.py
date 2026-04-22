@@ -22,6 +22,7 @@ def download_vimeo_video(url: str, username: str = "", password: str = "", inter
         'format': 'b*[ext=mp4]/b*',
         'quiet': True,
         'no_warnings': True,
+        'restrictfilenames': True,
     }
     
     ydl_opts = dict(ydl_opts_base)

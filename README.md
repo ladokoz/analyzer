@@ -7,14 +7,14 @@ Ahub Video Analyzer is an internal, web-based AI tool that leverages the Gemini 
 - **Batch Processing**: Process multiple YouTube and Vimeo URLs simultaneously in a background thread.
 - **Vimeo Support**: Natively downloads and processes Vimeo videos (even private ones with valid credentials).
 - **Gemini API Integration**: Built-in support for Gemini Flash and Pro models (including Gemini 3.1 Preview).
-- **Automated CSV Exports**: Automatically aggregates extracted video data into timestamped CSV batches.
+- **Automated CSV Exports**: Automatically aggregates extracted video data into timestamped, Excel-compatible CSV batches (UTF-8 with BOM).
 - **Persistent Queue**: A robust backend queuing system prevents active tasks from halting if the browser is closed.
 - **Robust Environment Security**: Sensitive API keys and credentials are natively managed via a root `.env` system, avoiding exposure through the web UI.
 - **Web-Based Updater**: Push-button updates from the Settings UI to pull the latest version from GitHub.
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### Requirements
 
@@ -82,7 +82,7 @@ chmod +x run.sh
 
 ---
 
-## ⚙️ Modifying Settings & Updates
+## Modifying Settings & Updates
 
 Once logged in, click the **⚙️ Settings** button near the top right. Here you can configure:
 - **App Version & Updates**: View the current version (e.g., `v1.2.0`) and click **Check Updates** to pull the latest changes from GitHub automatically.
@@ -94,7 +94,7 @@ Once logged in, click the **⚙️ Settings** button near the top right. Here yo
 
 ---
 
-## 🛠 File Architecture
+## File Architecture
 
 - `backend/main.py`: The core FastAPI routing and server backend logic.
 - `backend/worker.py`: Background threaded queue pipeline to prevent browser disconnects or refreshes from interrupting active API calls.

@@ -22,7 +22,7 @@ class SettingsModel(BaseModel):
 def load_settings() -> SettingsModel:
     if os.path.exists(CONFIG_FILE):
         try:
-            with open(CONFIG_FILE, "r") as f:
+            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 return SettingsModel(**data)
         except Exception:
@@ -31,5 +31,5 @@ def load_settings() -> SettingsModel:
 
 def save_settings(settings: SettingsModel):
     os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
-    with open(CONFIG_FILE, "w") as f:
+    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(settings.model_dump(), f)

@@ -2,6 +2,13 @@ from fastapi import FastAPI, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+import sys
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='backslashreplace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='backslashreplace')
+
 import os
 import logging
 import urllib.request
@@ -80,7 +87,7 @@ def update_settings(settings: SettingsModel, authorization: str = Header(None)):
 @app.get("/api/version")
 def get_version(authorization: str = Header(None)):
     verify_token(authorization)
-    version = "1.1.0"
+    version = "1.2.1"
     if os.path.exists("CHANGELOG.md"):
         with open("CHANGELOG.md", "r", encoding="utf-8") as f:
             content = f.read()
@@ -128,7 +135,7 @@ def clear_logs(authorization: str = Header(None)):
     verify_token(authorization)
     log_path = "data/app.log"
     if os.path.exists(log_path):
-        open(log_path, 'w').close()
+        open(log_path, 'w', encoding='utf-8').close()
     return {"status": "success", "message": "Logs cleared"}
 
 @app.get("/api/csvs")
